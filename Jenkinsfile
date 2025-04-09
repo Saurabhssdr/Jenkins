@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/Saurabhssdr/AWS-DevOps-Terraform'
+                git branch: 'main', url: 'https://github.com/Saurabhssdr/Jenkins'
             }
         }
  
