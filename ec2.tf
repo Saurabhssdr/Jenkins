@@ -53,6 +53,6 @@ resource "aws_instance" "web" {
  # key_name               = "EMRKEY"   Replace with your existing key pair 
 
   tags = {
-    Name = "Minimal"
+    Name = "Minimal-EC3"
   }
 }
