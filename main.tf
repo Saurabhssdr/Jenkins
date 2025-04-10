@@ -2,9 +2,20 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_s3_bucket" "csv_bucket" {
-  bucket = "my-5task-buck"  # must be globally unique
+resource "aws_s3_bucket" "task3_bucket" {
+  bucket = "my-5task-buck"
 }
+ 
+resource "aws_s3_bucket_notification" "s3_notify_lambda" {
+  bucket = aws_s3_bucket.task3_bucket.id
+ 
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.csvReader.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+}
+
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/csvReader"
