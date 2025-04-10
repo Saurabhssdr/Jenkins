@@ -5,22 +5,6 @@ provider "aws" {
 resource "aws_s3_bucket" "csv_bucket" {
   bucket = "my-5task-buck"
 }
- 
-resource "aws_s3_bucket_notification" "s3_notify_lambda" {
-  bucket = aws_s3_bucket.task3_bucket.id
-
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.csv_lambda.arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [
-    aws_lambda_permission.allow_s3,
-    aws_lambda_function.csv_lambda
-  ]
-}
-
-
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/csvReader"
@@ -79,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "attach_policy" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "${path.module}/lambda_function"
+  source_dir  = "${path.module}/lambda_function"  # Make sure this folder exists
   output_path = "${path.module}/lambda_function_payload.zip"
 }
 
@@ -89,7 +73,10 @@ resource "aws_lambda_function" "csv_lambda" {
   handler       = "main.lambda_handler"
   runtime       = "python3.9"
   filename      = data.archive_file.lambda_zip.output_path
-  depends_on    = [aws_iam_role_policy_attachment.attach_policy]
+
+  depends_on = [
+    aws_iam_role_policy_attachment.attach_policy
+  ]
 }
 
 resource "aws_lambda_permission" "allow_s3" {
@@ -100,3 +87,16 @@ resource "aws_lambda_permission" "allow_s3" {
   source_arn    = aws_s3_bucket.csv_bucket.arn
 }
 
+resource "aws_s3_bucket_notification" "s3_notify_lambda" {
+  bucket = aws_s3_bucket.csv_bucket.id  
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.csv_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [
+    aws_lambda_permission.allow_s3,
+    aws_lambda_function.csv_lambda
+  ]
+}
