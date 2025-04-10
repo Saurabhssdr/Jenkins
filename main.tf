@@ -2,15 +2,15 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_s3_bucket" "task3_bucket" {
+resource "aws_s3_bucket" "csv_bucket" {
   bucket = "my-5task-buck"
 }
  
 resource "aws_s3_bucket_notification" "s3_notify_lambda" {
-  bucket = aws_s3_bucket.task3_bucket.id
+  bucket = aws_s3_bucket.csv_bucket.id
  
   lambda_function {
-    lambda_function_arn = aws_lambda_function.csvReader.arn
+    lambda_function_arn = aws_lambda_function.csv_lambda.arn
     events              = ["s3:ObjectCreated:*"]
   }
 
