@@ -7,14 +7,19 @@ resource "aws_s3_bucket" "csv_bucket" {
 }
  
 resource "aws_s3_bucket_notification" "s3_notify_lambda" {
-  bucket = aws_s3_bucket.csv_bucket.id
- 
+  bucket = aws_s3_bucket.task3_bucket.id
+
   lambda_function {
     lambda_function_arn = aws_lambda_function.csv_lambda.arn
     events              = ["s3:ObjectCreated:*"]
   }
 
+  depends_on = [
+    aws_lambda_permission.allow_s3,
+    aws_lambda_function.csv_lambda
+  ]
 }
+
 
 
 resource "aws_cloudwatch_log_group" "lambda_logs" {
@@ -86,3 +91,12 @@ resource "aws_lambda_function" "csv_lambda" {
   filename      = data.archive_file.lambda_zip.output_path
   depends_on    = [aws_iam_role_policy_attachment.attach_policy]
 }
+
+resource "aws_lambda_permission" "allow_s3" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.csv_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.csv_bucket.arn
+}
+
