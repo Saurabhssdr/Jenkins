@@ -14,21 +14,21 @@ pipeline {
             }
         }
  
-        // stage('Terraform Init') {
-        //     steps {
-        //         sh 'terraform init'
-        //     }
-        // }
- 
-        // stage('Terraform Plan') {
-        //     steps {
-        //         sh 'terraform plan -out=tfplan'
-        //     }
-        // }
- 
-        stage('Terraform destroy') {
+        stage('Terraform Init') {
             steps {
-                sh 'terraform destroy -auto-approve'
+                sh 'terraform init'
+            }
+        }
+ 
+        stage('Terraform Plan') {
+            steps {
+                sh 'terraform plan -out=tfplan'
+            }
+        }
+ 
+        stage('Terraform apply') {
+            steps {
+                sh 'terraform apply -auto-approve'
             }
         }
     }
